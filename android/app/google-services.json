@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1077598625061",
+    "project_id": "paisa-loop-fa02f",
+    "storage_bucket": "paisa-loop-fa02f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1077598625061:android:98cfab157f50e57b4b8ecc",
+        "android_client_info": {
+          "package_name": "com.paisaloop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1077598625061-6gi7enik7ehb732fuu5tqr0rqlm4ctl0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.paisaloop",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "1077598625061-ev0edaiddn20e62u3i8836f9nnj31chu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2j5i7sLz6hQkNeqGva4GDkIYEY76UPIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1077598625061-ev0edaiddn20e62u3i8836f9nnj31chu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
