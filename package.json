@@ -10,13 +10,17 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^3.1.1",
     "@react-native-firebase/app": "^25.1.0",
     "@react-native-firebase/auth": "^25.1.0",
+    "@react-native-firebase/storage": "^25.1.0",
     "@react-native-google-signin/google-signin": "^16.1.2",
     "@react-native-vector-icons/fontawesome": "^13.1.2",
     "@react-native/new-app-screen": "0.86.0",
     "@react-navigation/native": "^7.3.3",
     "@react-navigation/native-stack": "^7.17.5",
+    "@reduxjs/toolkit": "^2.12.0",
+    "axios": "^1.19.0",
     "react": "19.2.3",
     "react-native": "0.86.0",
     "react-native-gesture-handler": "^3.0.2",
@@ -24,8 +28,11 @@
     "react-native-reanimated": "^4.4.1",
     "react-native-safe-area-context": "^5.8.0",
     "react-native-screens": "^4.25.2",
+    "react-native-toast-message": "^2.4.0",
     "react-native-vector-icons": "^10.3.0",
-    "react-native-worklets": "^0.9.2"
+    "react-native-worklets": "^0.9.2",
+    "react-redux": "^9.3.0",
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

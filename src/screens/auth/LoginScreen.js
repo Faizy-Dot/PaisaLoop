@@ -17,13 +17,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
-
+import Toast from 'react-native-toast-message';
+import { useDispatch } from 'react-redux';
+import { login } from '../../redux/authSlice';
 
 
 
 export default function LoginScreen() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const userCredential = getAuth().currentUser;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,68 +44,117 @@ export default function LoginScreen() {
 
       const auth = getAuth();
 
-      await signInWithEmailAndPassword(
+      const userCredential = await signInWithEmailAndPassword(
         auth,
         email.trim(),
         password,
       );
 
-      navigation.replace('Home');
+      dispatch(
+        login({
+          uid: userCredential.user.uid,
+          name: userCredential.user.displayName,
+          email: userCredential.user.email,
+          photo: userCredential.user.photoURL,
+        }),
+      );
+
+      Toast.show({
+        type: 'success',
+        text1: 'Login Successful',
+        text2: 'Welcome back 👋',
+      });
+     
     } catch (error) {
       console.log(error);
 
       switch (error.code) {
         case 'auth/invalid-credential':
-          alert('Invalid email or password');
+          Toast.show({
+            type: 'error',
+            text1: 'Login Failed',
+            text2: 'Invalid email or password',
+          });
           break;
 
         case 'auth/user-not-found':
-          alert('User not found');
+          Toast.show({
+            type: 'error',
+            text1: 'User Not Found',
+            text2: 'No account exists with this email.',
+          });
           break;
 
         case 'auth/wrong-password':
-          alert('Incorrect password');
+          Toast.show({
+            type: 'error',
+            text1: 'Incorrect Password',
+            text2: 'Please try again.',
+          });
           break;
 
         case 'auth/invalid-email':
-          alert('Invalid email address');
+          Toast.show({
+            type: 'error',
+            text1: 'Invalid Email',
+            text2: 'Please enter a valid email address.',
+          });
           break;
 
         default:
-          alert(error.message);
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: error.message,
+          });
       }
     } finally {
       setLoading(false);
     }
   };
 
- const signInWithGoogle = async () => {
-  try {
-    await GoogleSignin.hasPlayServices();
+  const signInWithGoogle = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
 
-    await GoogleSignin.signIn();
+      await GoogleSignin.signIn();
 
-    const tokens = await GoogleSignin.getTokens();
+      const tokens = await GoogleSignin.getTokens();
 
-    console.log('Tokens:', tokens);
+      console.log('Tokens:', tokens);
 
-    const credential = GoogleAuthProvider.credential(tokens.idToken , tokens.accessToken);
+      const credential = GoogleAuthProvider.credential(tokens.idToken, tokens.accessToken);
 
-    console.log("credential==>>>" , credential)
-    
-    const userCredential = await signInWithCredential(
-      getAuth(),
-      credential,
-    );
+      console.log("credential==>>>", credential)
 
-    console.log("google user ==>>",userCredential.user);
+      const userCredential = await signInWithCredential(
+        getAuth(),
+        credential,
+      );
 
-    navigation.replace('Home');
-  } catch (e) {
-    console.log(e);
-    alert(e.message);
-  }
-};
+      dispatch(
+        login({
+          uid: userCredential.user.uid,
+          name: userCredential.user.displayName,
+          email: userCredential.user.email,
+          photo: userCredential.user.photoURL,
+        }),
+      );
+
+      Toast.show({
+        type: 'success',
+        text1: 'Google Login Successful',
+        text2: 'Welcome back 👋',
+      });
+     
+      console.log("google user ==>>", userCredential.user);
+
+
+    } catch (e) {
+      console.log(e);
+      alert(e.message);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>

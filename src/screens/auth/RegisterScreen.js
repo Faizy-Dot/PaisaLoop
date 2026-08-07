@@ -10,6 +10,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getApp } from '@react-native-firebase/app';
+import { launchImageLibrary } from 'react-native-image-picker';
+import Toast from 'react-native-toast-message';
+import axios from 'axios';
 
 console.log(getApp().name);
 
@@ -19,20 +22,78 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+
+  const pickImage = async () => {
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      quality: 0.8,
+    });
+
+    if (result.didCancel) return;
+
+    if (result.errorCode) {
+      console.log(result.errorMessage);
+      return;
+    }
+
+    if (result.assets && result.assets.length > 0) {
+      setProfileImage(result.assets[0]);
+    }
+  };
+  ;
+
+
+
+const uploadImageToCloudinary = async (imageUri) => {
+  const data = new FormData();
+
+  data.append('file', {
+    uri: imageUri,
+    type: 'image/jpeg',
+    name: 'profile.jpg',
+  });
+
+  data.append('upload_preset', 'paisaloop');
+
+  const response = await axios.post(
+    'https://api.cloudinary.com/v1_1/dw2yrad8x/image/upload',
+    data,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    },
+  );
+
+  return response.data.secure_url;
+};
 
   const registerUser = async () => {
     if (!name || !email || !password || !confirmPassword) {
-      alert('Please fill all fields');
+      Toast.show({
+        type: 'error',
+        text1: 'Missing Information',
+        text2: 'Please fill all fields',
+      });
       return;
     }
 
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      Toast.show({
+        type: 'error',
+        text1: 'Password Mismatch',
+        text2: 'Passwords do not match',
+      });
       return;
     }
 
     if (password.length < 6) {
-      alert('Password must be at least 6 characters');
+      Toast.show({
+        type: 'error',
+        text1: 'Weak Password',
+        text2: 'Password must be at least 6 characters',
+      });
       return;
     }
 
@@ -47,22 +108,46 @@ export default function RegisterScreen({ navigation }) {
         password,
       );
 
+      const imageUrl = profileImage
+        ? await uploadImageToCloudinary(profileImage.uri)
+        : null;
+
       await updateProfile(userCredential.user, {
         displayName: name,
+        photoURL: imageUrl,
       });
 
-      alert('Account created successfully');
+      Toast.show({
+        type: 'success',
+        text1: 'Account Created',
+        text2: 'Welcome to PaisaLoop 👋',
+      });
 
-      navigation.replace('Home');
+      setTimeout(() => {
+        navigation.replace('Home');
+      }, 1000);
+
     } catch (error) {
       console.log(error);
 
       if (error.code === 'auth/email-already-in-use') {
-        alert('Email already exists');
+        Toast.show({
+          type: 'error',
+          text1: 'Registration Failed',
+          text2: 'Email already exists',
+        });
       } else if (error.code === 'auth/invalid-email') {
-        alert('Invalid email');
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Email',
+          text2: 'Please enter a valid email address',
+        });
       } else {
-        alert(error.message);
+        Toast.show({
+          type: 'error',
+          text1: 'Registration Failed',
+          text2: error.message,
+        });
       }
     } finally {
       setLoading(false);
@@ -72,14 +157,22 @@ export default function RegisterScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {/* Profile Image */}
-      <TouchableOpacity style={styles.imageContainer}>
+      <TouchableOpacity
+        style={styles.imageContainer}
+        onPress={pickImage}
+      >
         <Image
           source={{
-            uri: 'https://cdn-icons-png.flaticon.com/512/847/847969.png',
+            uri: profileImage?.uri
+              ? profileImage.uri
+              : 'https://cdn-icons-png.flaticon.com/512/847/847969.png',
           }}
           style={styles.profileImage}
         />
-        <Text style={styles.changePhoto}>Add Profile Photo</Text>
+
+        <Text style={styles.changePhoto}>
+          Add Profile Photo
+        </Text>
       </TouchableOpacity>
 
       <Text style={styles.title}>Create Account</Text>
